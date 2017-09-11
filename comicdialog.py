@@ -29,34 +29,28 @@ class ComicDialogBuilder(ttk.Frame):
     def __init__(self, parent):
         """ Prepare the frame and call the GUI initialization method.
         """
-        try:
-            Frame.__init__(self, parent)
-            self.parent = parent
+        Frame.__init__(self, parent)
+        self.parent = parent
 
-            # Setup main container
-            self.grid_rowconfigure(0, weight=1)
-            self.grid_columnconfigure(0, weight=1)
+        # Setup main container
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
 
-            self.status = StringVar()
-            self.status.set('stop')
+        self.status = StringVar()
+        self.status.set('stop')
 
-            # Load UI ---------------------------------------------------------
+        # Load UI ---------------------------------------------------------
 
-            self.loadMenuBar()
+        self.loadMenuBar()
 
-            # Start the show
-            self.exampleScene()
+        # Start the show
+        self.exampleScene()
 
-            self.loadEditor()
+        self.loadEditor()
 
-            ttk.Sizegrip(self.parent).grid(column=999, row=999, sticky=(S, E))
+        ttk.Sizegrip(self.parent).grid(column=999, row=999, sticky=(S, E))
 
-            # UI Loaded -------------------------------------------------------
-
-            # self.run()  # Start the main loop
-
-        except Exception as e:
-            logging.exception("Error: %s" % sys.exc_info()[0])
+        # UI Loaded -------------------------------------------------------
 
     # -------------------------------------------------------------------------
 
