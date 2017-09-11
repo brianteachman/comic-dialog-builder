@@ -1,4 +1,5 @@
 .idea/*
-tk_examples/*
-imgs/*
 __pycache__/*
+tk_examples/*
+#fonts/*
+imgs/*
