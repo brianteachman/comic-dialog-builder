@@ -1,3 +1,4 @@
 .idea/*
 tk_examples/*
 imgs/*
+__pycache__/*
