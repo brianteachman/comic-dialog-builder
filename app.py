@@ -1,3 +1,5 @@
+# @version 0.0.1
+
 from tkinter import *
 from tkinter import ttk
 from PIL import Image, ImageTk
@@ -15,9 +17,9 @@ import logging
 # 8. https://wiki.python.org/moin/TkInter
 
 
-class ComicStripEditor(ttk.Frame):
+class ComicDialogBuilder(ttk.Frame):
     """
-    Comic Strip Editor for my son, Logan. <3
+    Comic Strip Builder for my son, Logan. <3
     """
 
     def __init__(self, parent):
@@ -31,9 +33,10 @@ class ComicStripEditor(ttk.Frame):
             self.grid_rowconfigure(0, weight=1)
             self.grid_columnconfigure(0, weight=1)
 
-
             self.status = StringVar()
             self.status.set('stop')
+
+            # Load UI ---------------------------------------------------------
 
             self.loadMenuBar()
 
@@ -44,7 +47,9 @@ class ComicStripEditor(ttk.Frame):
 
             ttk.Sizegrip(self.parent).grid(column=999, row=999, sticky=(S, E))
 
-            self.run()  # Start the main loop
+            # UI Loaded -------------------------------------------------------
+
+            # self.run()  # Start the main loop
 
         except Exception as e:
             logging.exception("Error: %s" % sys.exc_info()[0])
@@ -226,22 +231,17 @@ class ComicStripEditor(ttk.Frame):
 
     # -------------------------------------------------------------------------
 
+
 def main():
     root = Tk()
-    root.title("DBZ Comic Creator")
+    root.title("Comic Dialog Builder")
 
     # -------------------------------------------------------------------------
-    # Configure ComicStripEditor
+    # Start ComicDialogBuilder
     # -------------------------------------------------------------------------
 
-    app = ComicStripEditor(root)
-
-    # -------------------------------------------------------------------------
-    # Run main loop
-    # -------------------------------------------------------------------------
-    # root.mainloop()
-    # app.run()
-    # app.mainloop()
+    app = ComicDialogBuilder(root)
+    app.run()
 
 if __name__ == "__main__":
     main()
