@@ -27,10 +27,13 @@ class ComicDialogBuilder(ttk.Frame):
     """
 
     def __init__(self, parent):
-        """ Prepare the frame and call the GUI initialization method.
-        """
-        Frame.__init__(self, parent)
+        """ Prepare the frame and call the GUI initialization method. """
+
+        ttk.Frame.__init__(self, parent)
         self.parent = parent
+
+        # Bindings
+        self.parent.bind('<1>', self.leftClick)
 
         # Setup main container
         self.grid_rowconfigure(0, weight=1)
@@ -39,18 +42,12 @@ class ComicDialogBuilder(ttk.Frame):
         self.status = StringVar()
         self.status.set('stop')
 
-        # Load UI ---------------------------------------------------------
-
+        # Load UI
         self.loadMenuBar()
-
-        # Start the show
         self.exampleScene()
-
         self.loadEditor()
 
-        ttk.Sizegrip(self.parent).grid(column=999, row=999, sticky=(S, E))
-
-        # UI Loaded -------------------------------------------------------
+        # ttk.Sizegrip(self.parent).grid(column=999, row=999, sticky=(S, E))
 
     # -------------------------------------------------------------------------
 
@@ -62,7 +59,8 @@ class ComicDialogBuilder(ttk.Frame):
         self.scene = self.setSceneBGImage('imgs/goku-vs-vegeta-1920-1080.jpg', (800, 449))
 
         # Add speech bubble over Goku's head
-        self.setDialog(self.scene, 'Your shoelace is untied.', bbox=(150, 100), resizebbox=(275, 90))
+        self.setDialog(self.scene, 'Your shoelace is untied.', bbox=(150, 120), resizebbox=(300, 80))
+        # self.setDialog(self.scene, 'Your shoelace is untied.', bbox=(150, 120))
 
         # Add thought bubble over Vegeta's head and speech bubble under his mouth
         self.setDialog(self.scene, 'Yeah right!',
@@ -175,7 +173,7 @@ class ComicDialogBuilder(ttk.Frame):
     def setDialog(self, scene, dialog, bbox, type='speech', resizebbox=None, transpose=None):
         """ Place (layer) a dialog box over a scene """
         if type == 'speech':
-            sandbox = Image.open('imgs/speech4.png') # PIL.Image
+            sandbox = Image.open('imgs/spb-300x165.png') # PIL.Image
         else: #if type == 'thought':
             sandbox = Image.open('imgs/thought.png')
         if resizebbox:
@@ -190,10 +188,13 @@ class ComicDialogBuilder(ttk.Frame):
             sandbox = sandbox.transpose(Image.ROTATE_180)
         elif transpose == 'rotate-270':
             sandbox = sandbox.transpose(Image.ROTATE_270)
-        self.setActorCaption(sandbox, dialog)
+        # print(bbox[0], bbox[1])
+        w = sandbox.width
+        h = sandbox.height
+        self.setActorCaption(sandbox, dialog, (w-(w-65), h-(h-30)))
         scene.paste(sandbox, bbox, sandbox)
 
-    def setActorCaption(self, image, dialog='Hello', bbox=[10, 10, 50,50], text_color='black'):
+    def setActorCaption(self, image, dialog='Hello', bbox=(0, 0), text_color='black'):
         """ Convert text to an image for layering
 
             Links:
@@ -202,10 +203,17 @@ class ComicDialogBuilder(ttk.Frame):
         """
         font = ImageFont.truetype("fonts/FreeMono.ttf", 15)
         draw = ImageDraw.Draw(image) # PIL.ImageDraw.Draw( PIL.Image )
-        draw.multiline_text((25, 33), dialog, font=font, fill=text_color)
+        # draw.multiline_text(bbox, dialog, font=font, fill=text_color)
+        # PIL.ImageDraw.Draw.multiline_text(xy, text, fill=None, font=None, anchor=None, spacing=0, align="left")
+        draw.multiline_text(bbox, dialog, font=font, fill=(0, 0, 0, 192))
 
     def run(self):
         self.parent.mainloop()
+
+    def leftClick(self, event):
+        """ """
+        mouse_x, mouse_y = event.x, event.y
+        print('{}, {}'.format(mouse_x, mouse_y))
 
     # Utilities ---------------------------------------------------------------
 
