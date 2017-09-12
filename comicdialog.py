@@ -19,7 +19,7 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 from PIL import ImageFont, ImageDraw
 import logging
-
+from caption import Caption
 
 class ComicDialogBuilder(ttk.Frame):
     """
@@ -27,8 +27,8 @@ class ComicDialogBuilder(ttk.Frame):
     """
 
     def __init__(self, parent):
-        """ Prepare the frame and call the GUI initialization method. """
-
+        """ Prepare the frame and call the GUI initialization method.
+        """
         ttk.Frame.__init__(self, parent)
         self.parent = parent
 
@@ -44,18 +44,36 @@ class ComicDialogBuilder(ttk.Frame):
 
         # Load UI
         self.loadMenuBar()
-        self.exampleScene()
+        # self.exampleScene1()
+        self.exampleScene2()
         self.loadEditor()
 
         # ttk.Sizegrip(self.parent).grid(column=999, row=999, sticky=(S, E))
 
     # -------------------------------------------------------------------------
 
-    def exampleScene(self, dialog=''):
+    def exampleScene1(self, dialog=''):
         """ Layer PIL.Image objects to compose a scene """
         self.setSceneTitle('Vageta wont be fooled again')
 
-        # sceneBackground = self.setBackground(''imgs/pico-geta-500x241.gif'', (500, 241))
+        self.scene = self.setSceneBGImage('imgs/pico-geta-500x241.gif', (500, 241))
+
+        # Add speech bubble from Vegeta
+        self.setDialog(self.scene, 'Weakling!', bbox=(140, 120), resizebbox=(150, 80), transpose='rotate-180')
+
+        self.sceneImage = self.scene
+
+        # Convert the PIL.Image object into a TkPhoto object
+        self.scene = ImageTk.PhotoImage(self.scene)
+
+        self.loadScene(self.scene)
+
+        print(self.sceneTitle + ', take 1.')
+
+    def exampleScene2(self, dialog=''):
+        """ Layer PIL.Image objects to compose a scene """
+        self.setSceneTitle('Vageta wont be fooled again')
+
         self.scene = self.setSceneBGImage('imgs/goku-vs-vegeta-1920-1080.jpg', (800, 449))
 
         # Add speech bubble over Goku's head
