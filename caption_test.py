@@ -37,7 +37,8 @@ class TestCaption(unittest.TestCase):
         caption.setText('Aha!')
         self.assertEqual(caption.getText(), 'Aha!')
 
-    def test_can_create_caption(self):
+    def test_create_caption_func(self):
+        self.caption = Caption(self.canvas)
         self.caption.createCaption('Aha!')
         self.assertEqual(self.caption.getId(), 1)
         self.assertEqual(self.caption.getText(), 'Aha!')

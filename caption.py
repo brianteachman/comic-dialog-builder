@@ -32,11 +32,18 @@ class Caption:
         return self.id
 
     def createCaption(self, caption_text=None):
-        self.setText(caption_text)
+        """ """
+        self.setCaptionBackGround()
 
-        bubbleimg = PhotoImage(file='imgs/spb-300x165.png')
-        self.canvas.create_image(0, 0, anchor=NW, image=bubbleimg, tags=('bubbleimg'))
-        self.canvas.create_text(75, 25, anchor=NW, text=caption_text, width=200)
+        self.setText(caption_text)
+        self.canvas.create_text(75, 25, anchor=NW, text=caption_text, width=200, tags=('captiontxt'))
+
+    def setCaptionBackGround(self, style='speech'):
+        if style == 'thought':
+            self.caption_img = PhotoImage(file='imgs/thought.png')
+        else:
+            self.caption_img = PhotoImage(file='imgs/spb-300x165.png')
+        self.canvas.create_image(0, 0, anchor=NW, image=self.caption_img, tags=('captionimg'))
 
     def setText(self, caption_text=None):
         if not caption_text and not self.caption_text:
@@ -53,15 +60,3 @@ class Caption:
 
     def setPosY(self):
         """ """
-
-
-if __name__ == '__main__':
-    canvas = Canvas(Tk())
-    for i in range(10):
-        caption = Caption(canvas)
-        caption.createCaption("Something_"+str(caption.getId()))
-        print(i, caption.getId(), caption.getText())
-
-    caption = Caption(canvas)
-    caption.createCaption('Aha!')
-    print( caption.getId(), caption.getText() )
