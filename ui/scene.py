@@ -1,76 +1,117 @@
-from tkinter import ttk, Canvas, N, S, E, W
-from PIL import Image, ImageTk
-from PIL import ImageFont, ImageDraw
+import tkinter as tk
+from tkinter import filedialog, messagebox
+
+from PIL import ImageTk, Image, ImageGrab
+from ui.caption import Caption
+from ui.layermanager import LayerManager
 
 
-class SceneModel:
-    """ """
-    def __init__(self, canvas, scene, bg_image):
-        self.bg_image = bg_image
-        self.canvas = canvas
-        self.model = scene
+class Scene(tk.Canvas):
 
-
-class Scene:
-    """ """
-
-    def __init__(self, parent, filename=None, resize=None):
+    def __init__(self, parent, height, width):
+        tk.Canvas.__init__(self, parent, width=width, height=height)
         self.parent = parent
+        self.layman = LayerManager(self)
+        self.scene_file_slug = 'default-scene'
+        self.scene_id = None
+        self.scene_img = None  # PIL.Image object
+        self.scene = None  # PIL.Image.PhotoImage
+        self.captions = []
+        self.last_x = 0
+        self.last_y = 0
+        # --------------------------------------------------
+        # https://stackoverflow.com/a/29016234/503781
+        self._drag_data = {'x': 0, 'y': 0, 'item': None}
+        # --------------------------------------------------
 
-        # init scene invariants
-        self.scene_title = "Default Scene"
-        self.scene_file_slug = None  # string
-        self.scene_image = None  # PIL.Image
-        self.scene = None  # PIL.ImageTk.PhotoImage
-
-        self.bg_image = None
-        self.scene = None
-        self.canvas = None
-        if filename:
-            self.bg_image = filename
-            self.write_name = "test-write"
-            self.scene = self.set_scene_bgimage(filename)
-
-    def load_scene(self, scene_image):
-        """ Adds composite scene (PIL.ImageTk) to Window """
-        scene = ttk.Label(self.parent, image=scene_image)
-        return scene.grid(row=1, column=0, sticky=(N, S, E, W))
-
-    def set_scene_bgimage(self, backdrop_file, resize=None):
-        """ Returns correctly sized background image """
-        self.bg_image = backdrop_file
-        scene = Image.open(backdrop_file)  # PIL.Image object
+    def new_image(self, filename, resize=None):
+        # load PIL.Image from file opened in binary mode
+        image = Image.open(open(filename, "rb"))
         if resize:
-            scene = scene.resize(resize)
-        # query image info
-        # print( scene.info.get('icc_profile') )
-        # print( scene.info.get('exif') )
-        self.scene = scene
-        return scene
+            image = image.resize(resize)
+        return image
 
-    def init_scene_canvas(self):
-        """ Adds composite scene (PIL.ImageTk) to Window """
-        canvas = Canvas(self.parent)  # TODO: finish this
-        scene_canvas = ttk.Frame(self.parent)
-        return scene_canvas.grid(row=1, column=0, sticky=(N, S, E, W))
+    def load_scene_image(self, filename, resize=None):
+        self.scene_img = self.new_image(filename, resize)
+        self.scene = ImageTk.PhotoImage(self.scene_img)
+        self.scene_id = self.create_image(0, 0, anchor=tk.NW, image=self.scene)
+        self.layman.lower_layer(self.scene_id)  # push image under captions
+        print('Scene', str(self.scene_id), 'loaded')
+        return self.scene_id
 
-    def save_scene(self, scene=None):
-        """ Write scene to file
+    def reload_scene_image(self, filename, resize=None):
+        self.scene_img = self.new_image(filename, resize)
+        self.scene = ImageTk.PhotoImage(self.scene_img)
+        self.itemconfig(self.scene_id, image=self.scene)
+        self.layman.lower_layer(self.scene_id)  # push image below captions
+        print('Scene', str(self.scene_id), 'loaded')
 
-            Links:
-            1. https://pillow.readthedocs.io/en/4.2.x/reference/Image.html#PIL.Image.Image.save
-            2. https://pillow.readthedocs.io/en/4.2.x/handbook/image-file-formats.html
-        """
-        if not scene:
-            scene = self.scene
-        scene.save('../imgs/saves/' + self.write_name + '.png', 'png',
-                   icc_profile=scene.info.get('icc_profile'))
-        # scene.save('../imgs/saves/' + self.write_name + '.jpg', 'jpeg',
-        #            icc_profile=scene.info.get('icc_profile'))
+    def add_caption(self, caption_text='', bubble_type=None):
+        position = {'x': self.last_x, 'y': self.last_y}
 
-    def update_scene(self):
-        """ Update Frame upon event """
-        # self.parent.status.set('Updating')
-        # print('Scene ' + self.status.get()+'.')
-        self.save_scene(self.scene)
-        # self.parent.status.set('Saved')
+        caption = Caption(self, caption_text, bubble_type, position)
+
+        self.bind_mouse_click(caption.cid)
+        self.captions.append(caption)
+
+        self.last_x += 100
+        self.last_y += 100
+        return caption.cid
+
+    # Bindings //////////////////////////////////////////////////////
+
+    def bind_mouse_click(self, cid):
+
+        # pass caption id to actual event handler, which usually only gets event
+        def md_handler(event, self=self, c_id=cid):
+            return self._mouse_down(event, c_id)
+
+        # pass caption id to actual event handler
+        def mm_handler(event, self=self, c_id=cid):
+            return self._mouse_move(event, c_id)
+
+        self.tag_bind(cid, "<ButtonPress-1>", md_handler)  # passes extra cid arg
+        self.tag_bind(cid, "<B1-Motion>", mm_handler)      # passes extra cid arg
+
+    def _mouse_down(self, event, c_id):
+        # self.scan_mark(event.x, event.y)
+        # item = self.find_withtag('caption-' + str(c_id))
+        # --------------------------------------------------
+        # https://stackoverflow.com/a/29016234/503781
+        item = self.find_closest(event.x, event.y)[0]
+        tags = self.gettags(item)
+        for tag in tags:
+            if tag.startswith("caption-"):
+                break
+        self._drag_data["item"] = tag
+        self._drag_data["x"] = event.x
+        self._drag_data["y"] = event.y
+        print(c_id, ':', item, tags)
+        # --------------------------------------------------
+
+    def _mouse_move(self, event, c_id):
+        # self.scan_dragto(event.x, event.y, gain=1)
+        # --------------------------------------------------
+        # https://stackoverflow.com/a/29016234/503781
+        delta_x = event.x - self._drag_data["x"]
+        delta_y = event.y - self._drag_data["y"]
+        # move the object the appropriate amount
+        self.move(self._drag_data["item"], delta_x, delta_y)
+        # record the new position
+        self._drag_data["x"] = event.x
+        self._drag_data["y"] = event.y
+        # --------------------------------------------------
+
+    # ///////////////////////////////////////////////////////////////
+
+    def save_scene(self, image=None):
+        if not image:
+            image = self.parent
+        x = image.winfo_rootx() + image.winfo_x()
+        y = image.winfo_rooty() + image.winfo_y()
+        x1 = x + image.winfo_width()
+        y1 = y + image.winfo_height()
+        filename = filedialog.asksaveasfilename(defaultextension='.jpg')
+        ImageGrab.grab().crop((x, y, x1, y1)).save(filename)
+        # ImageGrab.grab().crop((x, y, x1, y1)).save("imgs/saves/new2.png")
+        messagebox.showinfo(message=str(filename)+' loaded.')
