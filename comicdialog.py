@@ -21,9 +21,9 @@ from PIL import ImageFont, ImageDraw
 import logging
 from caption import Caption
 
+
 class ComicDialogBuilder(ttk.Frame):
-    """
-    Comic Strip Builder for my son, Logan. <3
+    """ Comic Strip Builder for my son, Logan. <3
     """
 
     def __init__(self, parent):
@@ -33,71 +33,75 @@ class ComicDialogBuilder(ttk.Frame):
         self.parent = parent
 
         # Bindings
-        self.parent.bind('<1>', self.leftClick)
+        # self.parent.bind('<1>', self.left_click)
 
         # Setup main container
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
+        # init messaging invariant
         self.status = StringVar()
-        self.status.set('stop')
+        self.status.set('Ready')
+
+        # init scene invariants
+        self.scene_title = "Default Scene"
+        self.scene_file_slug = None  # string
+        self.scene_image = None  # PIL.Image
+        self.scene = None  # PIL.ImageTk.PhotoImage
 
         # Load UI
-        self.loadMenuBar()
-        # self.exampleScene1()
-        self.exampleScene2()
-        self.loadEditor()
+        self.load_menubar()
+        # self.example_scene1()
+        self.example_scene2()
+        self.load_editor()
 
         # ttk.Sizegrip(self.parent).grid(column=999, row=999, sticky=(S, E))
 
+    def run(self):
+        self.parent.mainloop()
+
+    # -------------------------------------------------------------------------
+    # Example Scenes
     # -------------------------------------------------------------------------
 
-    def exampleScene1(self, dialog=''):
+    def example_scene1(self, dialog=''):
         """ Layer PIL.Image objects to compose a scene """
-        self.setSceneTitle('Vageta wont be fooled again')
+        self.set_scene_title('Vageta wont be fooled again')
 
-        self.scene = self.setSceneBGImage('imgs/pico-geta-500x241.gif', (500, 241))
+        # creates a PIL.Image
+        self.set_scene_image('imgs/pico-geta-500x241.gif', (500, 241))
 
         # Add speech bubble from Vegeta
-        self.setDialog(self.scene, 'Weakling!', bbox=(140, 120), resizebbox=(150, 80), transpose='rotate-180')
+        self.set_dialog(self.scene_image, 'Weakling!', bbox=(140, 120), resizebbox=(150, 80), transpose='rotate-180')
 
-        self.sceneImage = self.scene
+        self.load_scene(self.scene_image)
 
-        # Convert the PIL.Image object into a TkPhoto object
-        self.scene = ImageTk.PhotoImage(self.scene)
+        print(self.scene_title + ', take 1.')
 
-        self.loadScene(self.scene)
-
-        print(self.sceneTitle + ', take 1.')
-
-    def exampleScene2(self, dialog=''):
+    def example_scene2(self, dialog=''):
         """ Layer PIL.Image objects to compose a scene """
-        self.setSceneTitle('Vageta wont be fooled again')
+        self.set_scene_title('Vageta wont be fooled again')
 
-        self.scene = self.setSceneBGImage('imgs/goku-vs-vegeta-1920-1080.jpg', (800, 449))
+        # create a PIL.Image
+        self.set_scene_image('imgs/goku-vs-vegeta-1920-1080.jpg', (800, 449))
 
         # Add speech bubble over Goku's head
-        self.setDialog(self.scene, 'Your shoelace is untied.', bbox=(150, 120), resizebbox=(300, 80))
-        # self.setDialog(self.scene, 'Your shoelace is untied.', bbox=(150, 120))
+        self.set_dialog(self.scene_image, 'Your shoelace is untied.', bbox=(150, 120), resizebbox=(300, 80))
 
         # Add thought bubble over Vegeta's head and speech bubble under his mouth
-        self.setDialog(self.scene, 'Yeah right!',
-                       bbox=(290, 280), resizebbox=(200, 90), transpose='rotate-180')
-        self.setDialog(self.scene, 'Not falling for that again!', type='thought',
-                       bbox=(570, 20), resizebbox=(200, 90))
+        self.set_dialog(self.scene_image, 'Yeah right!', bbox=(290, 280), resizebbox=(200, 90), transpose='rotate-180')
+        self.set_dialog(self.scene_image, 'Not falling for that again!', type='thought', bbox=(570, 20), resizebbox=(200, 90))
+        # TODO: create Dialog object
 
-        self.sceneImage = self.scene
+        self.load_scene(self.scene_image)
 
-        # Convert the PIL.Image object into a TkPhoto object
-        self.scene = ImageTk.PhotoImage(self.scene)
-
-        self.loadScene(self.scene)
-
-        print(self.sceneTitle + ', take 1.')
+        print(self.scene_title + ', take 1.')
 
     # -------------------------------------------------------------------------
+    # Menubar
+    # -------------------------------------------------------------------------
 
-    def loadMenuBar(self):
+    def load_menubar(self):
         """ Add title bar to Window """
         self.titleBar = ttk.Label(self.parent, text='Menu stuff here...')
         # it's important to add this before creating menu
@@ -128,7 +132,7 @@ class ComicDialogBuilder(ttk.Frame):
 
         # menu_file.add_command(label='New', command=newFile)
         # menu_file.add_command(label='Open...', command=openFile)
-        menu_file.add_command(label='Save', command=self.saveScene)
+        menu_file.add_command(label='Save', command=self.save_scene)
         # menu_file.add_command(label='Close', command=closeFile)
 
         # menu_file.add_separator()  # ---------------------------------------------------
@@ -144,28 +148,11 @@ class ComicDialogBuilder(ttk.Frame):
 
         menu_help.add_command(label='About ComicDialog')
 
-    def setSceneBGImage(self, backdrop_file, resize=None):
-        """ Returns correctly sized background image """
-        scene = Image.open(backdrop_file) # PIL.Image object
-        if resize:
-            scene = scene.resize(resize)
-        # query image info
-        # print( scene.info.get('icc_profile') )
-        # print( scene.info.get('exif') )
-        return scene
+    # -------------------------------------------------------------------------
+    # Editor area
+    # -------------------------------------------------------------------------
 
-    def loadScene(self, scene_image):
-        """ Adds composite scene (PIL.ImageTk) to Window """
-        self.backgroundImage = ttk.Label(self.parent, image=scene_image)
-        self.backgroundImage.grid(row=1, column=0, sticky=(N, S, E, W))
-
-    def loadSceneCanvas(self, scene_image):
-        """ Adds composite scene (PIL.ImageTk) to Window """
-        canvas = Canvas(self.parent)
-        self.backgroundImage = ttk.Frame(self.parent)
-        self.backgroundImage.grid(row=1, column=0, sticky=(N, S, E, W))
-
-    def loadEditor(self):
+    def load_editor(self):
         """ Image Dialog Editor """
         editor = ttk.Labelframe(self.parent, text='Scene Editor', padding="3 3 12 12")
         # editor = ttk.Frame(self.parent, padding="3 3 12 12")
@@ -175,24 +162,84 @@ class ComicDialogBuilder(ttk.Frame):
         ttk.Entry(editor, textvariable=dialog, width=25).grid(row=0, column=0, sticky=(W, E))
         ttk.Separator(self.parent, orient=HORIZONTAL)
 
-        ttk.Button(editor, text="Update", command=self.updateScene).grid(row=1, column=0, sticky=E)
+        ttk.Button(editor, text="Update", command=self.update_scene).grid(row=1, column=0, sticky=E)
         ttk.Label(editor, textvariable=self.status).grid(row=1, column=1, sticky=(W, E))
         ttk.Separator(self.parent, orient=HORIZONTAL)
 
         ttk.Button(self.parent, text="Close", command=self.parent.quit).grid(row=2, column=0, sticky=E)
 
-    def updateScene(self):
+    # -------------------------------------------------------------------------
+    # Scene Model
+    # -------------------------------------------------------------------------
+
+    def load_image(self, filename, resize=None):
+        """ Returns correctly sized background image """
+        scene = Image.open(filename)  # PIL.Image object
+        if resize:
+            scene = scene.resize(resize)
+        # query image info
+        # print( scene.info.get('icc_profile') )
+        # print( scene.info.get('exif') )
+        return scene
+
+    def set_scene_image(self, filename, resize=None):
+        self.scene_image = self.load_image(filename, resize)
+
+    def load_scene(self, scene_image=None):
+        """ Adds composite scene (PIL.ImageTk) to Window """
+        if not scene_image:
+            scene_image = self.scene_image
+
+        # convert PIL.Image object into a TkPhoto object
+        self.scene = ImageTk.PhotoImage(scene_image)
+
+        # add to window
+        scene_label = ttk.Label(self.parent, image=self.scene)
+        scene_label.bind('<l>', self.left_click)
+        scene_label.grid(row=1, column=0, sticky=(N, S, E, W))
+
+    def load_scene_canvas(self, scene_image=None):
+        """ Adds composite scene (PIL.ImageTk) to Window """
+        if not scene_image:
+            scene_image = self.scene_image
+        canvas = Canvas(self.parent)  # TODO: complete and compare
+        self.scene_image = ttk.Frame(self.parent)
+        self.scene_image.grid(row=1, column=0, sticky=(N, S, E, W))
+
+    def update_scene(self):
         """ Update Frame upon event """
         self.status.set('Updating')
         print('Scene ' + self.status.get()+'.')
-        self.saveScene(self.sceneImage)
+        self.save_scene(self.scene_image)
         self.status.set('Saved')
 
-    def setDialog(self, scene, dialog, bbox, type='speech', resizebbox=None, transpose=None):
-        """ Place (layer) a dialog box over a scene """
+    def set_scene_title(self, title):
+        """ Set Scene title and file slug """
+        self.scene_title = title
+        title = title.replace(' ', '-')
+        self.scene_file_slug = title.replace(' ', '-').lower()
+
+    def save_scene(self, image=None):
+        """ Write scene to file
+            Links:
+            1. https://pillow.readthedocs.io/en/4.2.x/reference/Image.html#PIL.Image.Image.save
+            2. https://pillow.readthedocs.io/en/4.2.x/handbook/image-file-formats.html
+        """
+        if not image:
+            image = self.scene_image
+        image.save('imgs/saves/' + self.scene_file_slug + '.png', 'png', icc_profile=image.info.get('icc_profile'))
+        image.save('imgs/saves/' + self.scene_file_slug + '.jpg', 'jpeg', icc_profile=image.info.get('icc_profile'))
+
+    # -------------------------------------------------------------------------
+    # Dialog Actions
+    # -------------------------------------------------------------------------
+
+    def set_dialog(self, scene, dialog, bbox, type='speech', resizebbox=None, transpose=None):
+        """ Place (layer) a dialog box over a scene
+        """
         if type == 'speech':
-            sandbox = Image.open('imgs/spb-300x165.png') # PIL.Image
-        else: #if type == 'thought':
+            sandbox = Image.open('imgs/spb-300x165.png')  # PIL.Image
+        else:  # if type == 'thought':
             sandbox = Image.open('imgs/thought.png')
         if resizebbox:
             sandbox = sandbox.resize(resizebbox)
@@ -209,10 +256,11 @@ class ComicDialogBuilder(ttk.Frame):
         # print(bbox[0], bbox[1])
         w = sandbox.width
         h = sandbox.height
-        self.setActorCaption(sandbox, dialog, (w-(w-65), h-(h-30)))
+        self.set_actor_caption(sandbox, dialog, (w - (w - 65), h - (h - 30)))
         scene.paste(sandbox, bbox, sandbox)
+        # TODO: add binding
 
-    def setActorCaption(self, image, dialog='Hello', bbox=(0, 0), text_color='black'):
+    def set_actor_caption(self, image, dialog='Hello', bbox=(0, 0), text_color='black'):
         """ Convert text to an image for layering
 
             Links:
@@ -225,32 +273,11 @@ class ComicDialogBuilder(ttk.Frame):
         # PIL.ImageDraw.Draw.multiline_text(xy, text, fill=None, font=None, anchor=None, spacing=0, align="left")
         draw.multiline_text(bbox, dialog, font=font, fill=(0, 0, 0, 192))
 
-    def run(self):
-        self.parent.mainloop()
+    # -------------------------------------------------------------------------
+    # Bindings
+    # -------------------------------------------------------------------------
 
-    def leftClick(self, event):
+    def left_click(self, event):
         """ """
         mouse_x, mouse_y = event.x, event.y
         print('{}, {}'.format(mouse_x, mouse_y))
-
-    # Utilities ---------------------------------------------------------------
-
-    def setSceneTitle(self, title):
-        """ Set Scene title and file slug """
-        self.sceneTitle = title
-        title = title.replace(' ', '-')
-        self.sceneFileSlug = title.lower()
-
-    def saveScene(self, scene=None):
-        """ Write scene to file
-
-            Links:
-            1. https://pillow.readthedocs.io/en/4.2.x/reference/Image.html#PIL.Image.Image.save
-            2. https://pillow.readthedocs.io/en/4.2.x/handbook/image-file-formats.html
-        """
-        if not scene:
-            scene = self.sceneImage
-        scene.save('imgs/saves/'+self.sceneFileSlug+'.png', 'png', icc_profile=scene.info.get('icc_profile'))
-        scene.save('imgs/saves/'+self.sceneFileSlug+'.jpg', 'jpeg', icc_profile=scene.info.get('icc_profile'))
-
-    # -------------------------------------------------------------------------
