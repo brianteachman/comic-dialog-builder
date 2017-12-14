@@ -21,7 +21,10 @@ class App:
         self.window['container'] = ttk.Frame(self.root)
         self.window['container'].grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E, tk.S))
 
-        self.window['canvas'] = Scene(self.window['container'], height=400, width=600)  # tk.Canvas instance
+        self.canvas_width = 600
+        self.canvas_height = 400
+        # self.window['canvas'] = Scene(self.window['container'], height=self.canvas_height, width=self.canvas_width)  # tk.Canvas instance
+        self.window['canvas'] = Scene(self.window['container'], height=self.canvas_height, width=self.canvas_width)  # tk.Canvas instance
         self.window['canvas'].grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
         # self.canvas = Scene(self.container, height=400, width=600)  # is a tk.Canvas instance
         # self.canvas.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
@@ -37,7 +40,6 @@ class App:
         # -------------------------------------------------------------------
 
         self.window['dashboard'] = ttk.Frame(self.root)
-        # dashboard.config(background="white")
         self.window['dashboard'].grid(column=0, row=1, sticky=(tk.N, tk.W, tk.E, tk.S))
 
         # -----------------------------------------------------------------------------
@@ -50,14 +52,16 @@ class App:
         self.window['editor'] = CaptionEditor(self.window['dashboard'], self.window['canvas'])
 
     def test_scene(self):
-        scene_id = self.window['canvas'].load_scene_image('imgs/saiyaman.gif', (600, 400))
+        scene_id = self.window['canvas'].load_scene('imgs/saiyaman.gif')
+        # scene_id = self.window['canvas'].load_scene('imgs/saiyaman.gif', (self.canvas_width, self.canvas_height))
 
-        caption = ("Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello "
-                   "Hello Hello Hello Hello Hello Hello Hello Hello Hello Hello"
+        caption = ("I am the hope of the universe. I am the answer to all living things "
+                   "that cry out for peace. I am protector of the innocent. I am the "
+                   "light in the darkness. I am truth. Ally to good! Nightmare to you!"
                    )
 
-        # caption_1 = self.window['canvas'].add_caption("Cape does not match my suit", bubble_type='thought')
         caption_1 = self.window['canvas'].add_caption(caption)
+        # caption_1 = self.window['canvas'].add_caption("Cape does not match my suit", bubble_type='thought')
         # caption_2 = self.window['canvas'].add_caption("What the #*@$!", bubble_type='thought')
 
     def run(self):

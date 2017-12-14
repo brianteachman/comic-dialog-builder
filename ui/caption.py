@@ -4,14 +4,21 @@ from PIL import ImageTk, Image
 
 class Caption:
     """ """
+    text = ''
 
     lastx = None
     lasty = None
     speech_bubble = 'imgs/spb-300x165.png'
     thought_bubble = 'imgs/thought.png'
 
-    def __init__(self, canvas, caption_text, bubble_type='speech', position={'x': 0, 'y': 0}):
-        self.text = caption_text
+    long_sample = ("I am the hope of the universe. I am the answer to all living things "
+                   "that cry out for peace. I am protector of the innocent. I am the "
+                   "light in the darkness. I am truth. Ally to good! Nightmare to you!"
+                   )
+
+    def __init__(self, canvas, caption_text=None, bubble_type='speech', position={'x': 0, 'y': 0}):
+        if not caption_text:
+            self.text = caption_text
         self.type = bubble_type  # 'speech' or 'thought'
         self.speech_img = ImageTk.PhotoImage(Image.open(self.speech_bubble))
         self.thought_img = ImageTk.PhotoImage(Image.open(self.thought_bubble))

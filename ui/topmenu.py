@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, colorchooser
 
 from PIL import Image
 
@@ -57,6 +57,8 @@ class TopMenu:
 
         menu_edit.add_command(label='Color Picker', command=self.color_picker)
 
+        menu_edit.add_command(label='Add DBZ Quote', command=self.add_quote)
+
         # -----------------------------------------------------------------------------
         # Help menu items
         # -----------------------------------------------------------------------------
@@ -73,26 +75,28 @@ class TopMenu:
 
     def file_open(self):
         filename = tk.filedialog.askopenfilename()
-        image = self.deps['canvas'].new_image(filename)
-
-        # img = self.deps['canvas'].new_image(str(filename), (600, 400))
-        # self.deps['canvas'].load_scene_image(img)
-        # self.deps['canvas'].reload_scene_image(filename, image.size)
-        # self.deps['canvas'].reload_scene_image(filename, (width, height))
-        self.deps['canvas'].reload_scene_image(filename, (600, 400))
+        # self.deps['canvas'].load_scene(filename, image.size)
+        # self.deps['canvas'].load_scene(filename, (width, height))
+        self.deps['canvas'].load_scene(filename, (600, 400))
 
         # print(self.deps['canvas'].configure()['width'])
         # self.deps['canvas'].load_scene_image(Image.open(filename))
         print("Opened", filename)
-        # filename = tk.filedialog.askdirectory()
 
     # -----------------------------------------------------------------------------
     # Edit menu callbacks
     # -----------------------------------------------------------------------------
 
     def color_picker(self):
-        color = tk.colorchooser.askcolor(initialcolor='#ff0000')
+        color = colorchooser.askcolor(initialcolor='#ff0000')
         print(color)
+
+    def add_quote(self):
+        add_quote = tk.Toplevel(height=400, width=400)
+        add_quote.title('DBZ Quote Manager')
+        add_label = ttk.Label(add_quote, text='Add new quote below:')
+        add_label.grid(row=0, column=0, padx=20, pady=20, sticky=(tk.N, tk.W, tk.E, tk.S))
+        add_quote.focus_force()
 
     # -----------------------------------------------------------------------------
     # Help menu callbacks

@@ -4,13 +4,13 @@ from tkinter import ttk
 
 class CaptionEditor:
     """ """
-    caption_text = ''
+    caption_text = None
 
     def __init__(self, parent, scene):
         """ Image Dialog Editor """
         self.parent = parent
 
-        self.editor_text = tk.StringVar()
+        self.caption_text = tk.StringVar()
 
         # -------------------------------------------------------------------
         # Input Frame
@@ -26,11 +26,11 @@ class CaptionEditor:
 
         #  Entry form -------------------------------------------------------
 
-        # EFFECTS: self.editor_text
-        caption_text = ttk.Entry(editor, textvariable=self.editor_text, width=25)
-        caption_text.grid(row=0, column=0, columnspan=2,
-                          padx=2, pady=1, ipadx=2, ipady=2,
-                          sticky=(tk.N, tk.E, tk.W))
+        # MODIFIES: self.caption_text
+        caption_entry = ttk.Entry(editor, textvariable=self.caption_text, width=25)
+        caption_entry.grid(row=0, column=0, columnspan=2,
+                           padx=2, pady=1, ipadx=2, ipady=2,
+                           sticky=(tk.N, tk.E, tk.W))
 
         ttk.Separator(self.parent, orient=tk.HORIZONTAL)
 
@@ -59,7 +59,7 @@ class CaptionEditor:
         editor_output = ttk.Labelframe(self.parent, text='Scene Output', padding="3 3 12 12")
         editor_output.grid(row=2, column=1, padx=2, pady=2, sticky=(tk.N, tk.W, tk.E, tk.S))
 
-        caption_label = ttk.Label(editor_output, textvariable=self.editor_text)
+        caption_label = ttk.Label(editor_output, textvariable=self.caption_text)
         caption_label.grid(row=0, column=0, columnspan=2, padx=2, pady=2, sticky=(tk.N, tk.W, tk.E, tk.S))
 
         # -------------------------------------------------------------------
@@ -70,7 +70,8 @@ class CaptionEditor:
         close_app.grid(row=0, column=2, padx=5, pady=2, sticky=tk.E)
 
     def update_message(self):
-        print(self.editor_text.get(), 'rumple')
+        print(self.caption_text.get(), 'rumple')
 
-    def caption_lock(self, event):
+    def caption_lock(self):
+        self._is_caption_locked = not self._is_caption_locked
         print(self._is_caption_locked)

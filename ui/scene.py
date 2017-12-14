@@ -31,18 +31,16 @@ class Scene(tk.Canvas):
             image = image.resize(resize)
         return image
 
-    def load_scene_image(self, filename, resize=None):
+    def load_scene_image(self, filename, resize):
         self.scene_img = self.new_image(filename, resize)
         self.scene = ImageTk.PhotoImage(self.scene_img)
-        self.scene_id = self.create_image(0, 0, anchor=tk.NW, image=self.scene)
-        self.layman.lower_layer(self.scene_id)  # push image under captions
-        print('Scene', str(self.scene_id), 'loaded')
-        return self.scene_id
 
-    def reload_scene_image(self, filename, resize=None):
-        self.scene_img = self.new_image(filename, resize)
-        self.scene = ImageTk.PhotoImage(self.scene_img)
-        self.itemconfig(self.scene_id, image=self.scene)
+    def load_scene(self, filename, resize=None):
+        self.load_scene_image(filename, resize)
+        if not self.scene_id:
+            self.scene_id = self.create_image(0, 0, anchor=tk.NW, image=self.scene)
+        else:
+            self.itemconfig(self.scene_id, image=self.scene)
         self.layman.lower_layer(self.scene_id)  # push image below captions
         print('Scene', str(self.scene_id), 'loaded')
 
@@ -50,6 +48,8 @@ class Scene(tk.Canvas):
         position = {'x': self.last_x, 'y': self.last_y}
 
         caption = Caption(self, caption_text, bubble_type, position)
+        # if caption.text == '':
+        #     caption.text = caption.long_sample
 
         self.bind_mouse_click(caption.cid)
         self.captions.append(caption)
