@@ -23,11 +23,9 @@ class App:
 
         self.canvas_width = 600
         self.canvas_height = 400
-        # self.window['canvas'] = Scene(self.window['container'], height=self.canvas_height, width=self.canvas_width)  # tk.Canvas instance
-        self.window['canvas'] = Scene(self.window['container'], height=self.canvas_height, width=self.canvas_width)  # tk.Canvas instance
-        self.window['canvas'].grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
-        # self.canvas = Scene(self.container, height=400, width=600)  # is a tk.Canvas instance
-        # self.canvas.grid(column=0, row=0, sticky=(tk.N, tk.W, tk.E))
+        self.window['canvas'] = Scene(self.window['container'],
+                                      height=self.canvas_height, width=self.canvas_width)
+        self.window['canvas'].grid(column=0, row=0, sticky=(tk.N, tk.E, tk.S, tk.W))
 
         # -------------------------------------------------------------------
         # Menubar
@@ -45,32 +43,27 @@ class App:
         # -----------------------------------------------------------------------------
 
         # Checkbox to lock captions
-        self.l1_on = False
+        # self.l1_on = False
 
         # -----------------------------------------------------------------------------
 
         self.window['editor'] = CaptionEditor(self.window['dashboard'], self.window['canvas'])
 
-    def test_scene(self):
-        scene_id = self.window['canvas'].load_scene('imgs/saiyaman.gif')
-        # scene_id = self.window['canvas'].load_scene('imgs/saiyaman.gif', (self.canvas_width, self.canvas_height))
+    def load_scene(self, filename, resize=None):
+        if not resize:
+            resize = (self.canvas_width, self.canvas_height)
+        scene_id = self.window['canvas'].load_scene(filename, resize)
 
-        caption = ("I am the hope of the universe. I am the answer to all living things "
-                   "that cry out for peace. I am protector of the innocent. I am the "
-                   "light in the darkness. I am truth. Ally to good! Nightmare to you!"
-                   )
-
-        caption_1 = self.window['canvas'].add_caption(caption)
-        # caption_1 = self.window['canvas'].add_caption("Cape does not match my suit", bubble_type='thought')
-        # caption_2 = self.window['canvas'].add_caption("What the #*@$!", bubble_type='thought')
+    def add_caption(self, caption):
+        if len(caption) < 25:  # trivial, will want to override
+            caption_id = self.window['canvas'].add_caption("What the #*@$!", 'thought')
+        else:
+            caption_id = self.window['canvas'].add_caption(caption)
+        self.window['canvas'].captions[caption_id / 2] = caption  # local caption id
+        print('Caption', caption_id, 'added')
 
     def run(self):
         self.root.mainloop()
-
-    def layer_on(self, event):
-        """ Image layer on flag """
-        self.l1_on = not self.l1_on
-        print(self.l1_on)
 
     def btn_pushed(self):
         print("Button pushed")

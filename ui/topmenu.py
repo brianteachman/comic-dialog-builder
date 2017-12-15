@@ -95,7 +95,7 @@ class TopMenu:
         add_quote = tk.Toplevel(height=400, width=400)
         add_quote.title('DBZ Quote Manager')
         add_label = ttk.Label(add_quote, text='Add new quote below:')
-        add_label.grid(row=0, column=0, padx=20, pady=20, sticky=(tk.N, tk.W, tk.E, tk.S))
+        add_label.grid(row=0, column=0, padx=2, pady=2, sticky=(tk.N, tk.W, tk.E, tk.S))
         add_quote.focus_force()
 
     # -----------------------------------------------------------------------------

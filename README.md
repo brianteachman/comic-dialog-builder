@@ -1,6 +1,6 @@
 # Comic Dialog Editor
 
-![Alt text](docs/ui-class-diagram.jpg "Class overview")
+![Alt text](docs/app-class-overview.jpg "Class overview")
 
 ## Scene Class
 

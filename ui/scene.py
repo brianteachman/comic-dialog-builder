@@ -16,7 +16,8 @@ class Scene(tk.Canvas):
         self.scene_id = None
         self.scene_img = None  # PIL.Image object
         self.scene = None  # PIL.Image.PhotoImage
-        self.captions = []
+        self.active_caption = None
+        self.captions = {}
         self.last_x = 0
         self.last_y = 0
         # --------------------------------------------------
@@ -43,24 +44,34 @@ class Scene(tk.Canvas):
             self.itemconfig(self.scene_id, image=self.scene)
         self.layman.lower_layer(self.scene_id)  # push image below captions
         print('Scene', str(self.scene_id), 'loaded')
+        return self.scene_id
 
-    def add_caption(self, caption_text='', bubble_type=None):
+    def add_caption(self, caption_text='', bubble_type='speech'):
         position = {'x': self.last_x, 'y': self.last_y}
 
         caption = Caption(self, caption_text, bubble_type, position)
         # if caption.text == '':
         #     caption.text = caption.long_sample
 
-        self.bind_mouse_click(caption.cid)
-        self.captions.append(caption)
+        # self.active_caption = int(caption.cid)
+        self.active_caption = int(caption.cid / 2)  # local caption id
+        self.bind_mouse_click(self.active_caption)
+        # self.captions.append(caption)
+        self.captions[self.active_caption] = caption
 
         self.last_x += 100
         self.last_y += 100
-        return caption.cid
+        return self.active_caption
+
+    def update_caption_text(self, text):
+        # self.itemconfig(self.active_caption + 1, text=text.get())
+        self.itemconfig((self.active_caption*2)+1, text=text.get())
 
     # Bindings //////////////////////////////////////////////////////
 
     def bind_mouse_click(self, cid):
+
+        cid *= 2  # from local caption id
 
         # pass caption id to actual event handler, which usually only gets event
         def md_handler(event, self=self, c_id=cid):
