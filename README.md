@@ -4,7 +4,7 @@
 
 ![Alt text](docs/screenshot.jpg "GUI screenshot")
 
-## 
+## Here's some class diagrams
 
 ![Alt text](docs/app-class-overview.jpg "Class overview")
 
