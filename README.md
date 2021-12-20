@@ -1,5 +1,11 @@
 # Comic Dialog Editor
 
+## 
+
+![Alt text](docs/screenshot.jpg "GUI screenshot")
+
+## 
+
 ![Alt text](docs/app-class-overview.jpg "Class overview")
 
 ## Scene Class
