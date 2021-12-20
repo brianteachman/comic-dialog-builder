@@ -2,7 +2,7 @@
 
 ## 
 
-![Gui Screenshot](docs/screenshot.jpg "GUI screenshot")
+![Gui Screenshot](docs/screenshot.JPG "GUI screenshot")
 
 ## Here's some class diagrams
 
