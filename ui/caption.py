@@ -13,9 +13,7 @@ class Caption:
 
     long_sample = ("I am the hope of the universe. I am the answer to all living things "
                    "that cry out for peace. I am protector of the innocent. I am the "
-                   "light in the darknes"
-                   "s. I am truth. Ally to good! Nightmare to you!"
-                   )
+                   "light in the darkness. I am truth. Ally to good! Nightmare to you!")
 
     def __init__(self, canvas, caption_text=None, bubble_type='speech', position={'x': 0, 'y': 0}):
         self.canvas = canvas

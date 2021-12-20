@@ -12,4 +12,6 @@ caption = ("I am the hope of the universe. I am the answer to all living things 
 # caption = "What's that?"  # thought bubble
 app.add_caption(caption)
 
-app.run()
+
+if __name__ == '__main__':
+    app.run()
